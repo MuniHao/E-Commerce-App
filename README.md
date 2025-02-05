@@ -4,8 +4,8 @@ Course: CT312H-Mobile Programming.
 
 Semester 2, Academic year: 2024-2025.
 
-**Student ID**: ...
+**Student ID**: B2110011
 
-**Student Name**: ...
+**Student Name**: Nguyen Nhat Hao
 
-**Class Number**: ...
+**Class Number**: M0M1
