@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/product.dart';
 
 class ProductDetailScreen extends StatefulWidget {
+  static const routeName = '/product_detail';
   const ProductDetailScreen(
     this.product, {
     super.key,
@@ -15,7 +16,7 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _quantity = 1;
-  String? _choosenSize; 
+  String? _choosenSize;
   bool _isFavorite = false;
 
   final List<String> _availableSizes = ['XS', 'S', 'M', 'L', 'XL'];
@@ -125,7 +126,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Choosen Size', 
+                    'Choosen Size',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: Colors.green,
                           fontWeight: FontWeight.bold,
@@ -135,23 +136,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   Wrap(
                     spacing: 12,
                     children: _availableSizes.map((size) {
-                      final isChoosen = _choosenSize == size; 
+                      final isChoosen = _choosenSize == size;
                       return ChoiceChip(
                         label: Text(size),
-                        selected : isChoosen,
+                        selected: isChoosen,
                         onSelected: (bool choosen) {
                           setState(() {
-                            _choosenSize = choosen
-                                ? size
-                                : null; 
+                            _choosenSize = choosen ? size : null;
                           });
                         },
                         selectedColor: Colors.green,
                         backgroundColor: Colors.grey[200],
                         labelStyle: TextStyle(
-                          color: isChoosen
-                              ? Colors.white
-                              : Colors.black, 
+                          color: isChoosen ? Colors.white : Colors.black,
                         ),
                       );
                     }).toList(),
@@ -218,13 +215,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     children: [
                       Expanded(child: Container()),
                       ElevatedButton.icon(
-                        onPressed: _choosenSize !=
-                                null 
+                        onPressed: _choosenSize != null
                             ? () {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      'Added $_quantity ${widget.product.title} (Size $_choosenSize) to cart', 
+                                      'Added $_quantity ${widget.product.title} (Size $_choosenSize) to cart',
                                       textAlign: TextAlign.center,
                                     ),
                                     duration: const Duration(seconds: 2),
