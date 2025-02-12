@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../models/product.dart';
 
+import '../../ui/cart/cart_screen.dart';
+import '../products/products_overview_screen.dart';
+
 class ProductDetailScreen extends StatefulWidget {
   static const routeName = '/product_detail';
   const ProductDetailScreen(
@@ -33,12 +36,46 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
   }
 
+  void _navigateWithAnimation(BuildContext context, Widget page) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => page,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const curve = Curves.easeInOut;
+          final curvedAnimation = CurvedAnimation(
+            parent: animation,
+            curve: curve,
+          );
+          return FadeTransition(
+            opacity: curvedAnimation,
+            child: child,
+          );
+        },
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.product.title),
         backgroundColor: Colors.green,
+               actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              _navigateWithAnimation(context, const ProductsOverviewScreen());
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.shopping_cart),
+            onPressed: () {
+              _navigateWithAnimation(context, const CartScreen());
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
