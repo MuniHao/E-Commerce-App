@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../../models/product.dart';
 import 'product_detail_screen.dart';
 
+import 'package:provider/provider.dart';
+import '../products/products_manager.dart';
+
 class ProductGridTile extends StatelessWidget {
   const ProductGridTile(
     this.product, {
@@ -19,23 +22,26 @@ class ProductGridTile extends StatelessWidget {
           footer: ProductGridFooter(
             product: product,
             onFavoritePressed: () {
-              print('Toggle a favorite product');
+              //print('Toggle a favorite product');
+              context.read<ProductsManager>().updateProduct(
+                product.copyWith(
+                  isFavorite: !product.isFavorite,
+                )
+              );
             },
             onAddToCartPressed: () {
               print('Add item to cart');
             },
           ),
-          child: GestureDetector(onTap: () {
-            Navigator.of(context).pushNamed(
-              ProductDetailScreen.routeName,
-              arguments: product.id,
-            );
-          },
-          child: Image.network(product.imageUrl,
-            fit: BoxFit.cover
-            ),
-          )
-      ),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.of(context).pushNamed(
+                ProductDetailScreen.routeName,
+                arguments: product.id,
+              );
+            },
+            child: Image.network(product.imageUrl, fit: BoxFit.cover),
+          )),
     );
   }
 }

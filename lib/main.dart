@@ -5,6 +5,7 @@ import 'ui/products/user_products_screen.dart';
 import 'ui/orders/orders_screen.dart';
 import 'ui/products/product_detail_screen.dart';
 import 'ui/products/products_manager.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,38 +34,46 @@ class MyApp extends StatelessWidget {
       ),
     );
 
-    return MaterialApp(
-      title: 'MyShop',
-      debugShowCheckedModeBanner: false,
-      theme: themeData,
-      home: const ProductsOverviewScreen(),
-      routes: {
-        CartScreen.routeName: (ctx) => const SafeArea(
-              child: CartScreen(),
-            ),
-        OrdersScreen.routeName: (ctx) => const SafeArea(
-              child: OrdersScreen(),
-            ),
-        UserProductsScreen.routeName: (ctx) => const SafeArea(
-              child: UserProductsScreen(),
-            ),
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == ProductDetailScreen.routeName) {
-          final productId = settings.arguments as String;
-          return MaterialPageRoute(
-            settings: settings,
-            builder: (ctx) {
-              return SafeArea(
-                child: ProductDetailScreen(
-                  ProductsManager().findById(productId)!,
-                ),
-              );
-            },
-          );
-        }
-        return null;
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (ctx) => ProductsManager(),
+        )
+      ],
+      child: MaterialApp(
+        title: 'MyShop',
+        debugShowCheckedModeBanner: false,
+        theme: themeData,
+        home: const ProductsOverviewScreen(),
+        routes: {
+          CartScreen.routeName: (ctx) => const SafeArea(
+                child: CartScreen(),
+              ),
+          OrdersScreen.routeName: (ctx) => const SafeArea(
+                child: OrdersScreen(),
+              ),
+          UserProductsScreen.routeName: (ctx) => const SafeArea(
+                child: UserProductsScreen(),
+              ),
+        },
+        onGenerateRoute: (settings) {
+          if (settings.name == ProductDetailScreen.routeName) {
+            final productId = settings.arguments as String;
+            return MaterialPageRoute(
+              // settings: settings,
+              builder: (ctx) {
+                return SafeArea(
+                  child: ProductDetailScreen(
+                    //ProductsManager().findById(productId)!,
+                    ctx.read<ProductsManager>().findById(productId)!,
+                  ),
+                );
+              },
+            );
+          }
+          return null;
+        },
+      ),
     );
   }
 }
