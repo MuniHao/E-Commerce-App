@@ -5,6 +5,8 @@ import 'cart_item_card.dart';
 
 import 'package:provider/provider.dart';
 
+import '../orders/orders_manager.dart';
+
 class CartScreen extends StatelessWidget {
   static const routeName = '/cart';
   const CartScreen({super.key});
@@ -20,12 +22,19 @@ class CartScreen extends StatelessWidget {
       ),
       body: Column(children: <Widget>[
         CartSummary(
-          cart: cart,
-          onOrderNowPressed: () {
-            // Implement logic to place order
-            print('An order has been added');
-          },
-        ),
+            cart: cart,
+            onOrderNowPressed:
+                // Implement logic to place order
+                //print('An order has been added');
+                cart.totalAmount <= 0
+                    ? null
+                    : () {
+                        context.read<OrdersManager>().addOrder(
+                              cart.products,
+                              cart.totalAmount,
+                            );
+                        cart.clearAllItems();
+                      }),
         const SizedBox(height: 10),
         Expanded(child: CartItemList(cart)),
       ]),

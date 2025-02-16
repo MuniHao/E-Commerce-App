@@ -1,7 +1,9 @@
 import '../../models/cart_item.dart';
 import '../../models/order_item.dart';
 
-class OrdersManager {
+import 'package:flutter/foundation.dart';
+
+class OrdersManager with ChangeNotifier {
   final List<OrderItem> _orders = [
     OrderItem(
       id: 'o1',
@@ -25,5 +27,17 @@ class OrdersManager {
 
   List<OrderItem> get orders {
     return [..._orders];
+  }
+
+  void addOrder(List<CartItem> cartProducts, double total) {
+    _orders.insert(
+        0,
+        OrderItem(
+          id: 'o${DateTime.now().toIso8601String()}',
+          amount: total,
+          products: cartProducts,
+          dateTime: DateTime.now(),
+        ));
+    notifyListeners();
   }
 }
