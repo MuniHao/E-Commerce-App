@@ -17,9 +17,9 @@ class ProductsGrid extends StatelessWidget {
     // final products =
     //     showFavorites ? productsManager.favoriteItems : productsManager.items;
     final products = context.select<ProductsManager, List<Product>>(
-      (ProductsManager) => showFavorites 
-        ? ProductsManager.favoriteItems
-        : ProductsManager.items,
+      (productsManager) => showFavorites 
+        ? productsManager.favoriteItems
+        : productsManager.items,
     );
 
     return GridView.builder(

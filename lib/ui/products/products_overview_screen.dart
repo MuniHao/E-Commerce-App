@@ -4,6 +4,7 @@ import 'package:myshop/ui/shared/app_drawer.dart';
 
 import 'products_grid.dart';
 import '../cart/cart_manager.dart';
+import 'package:provider/provider.dart';
 
 enum FilterOptions { favorites, all }
 
@@ -84,14 +85,18 @@ class ShoppingCartButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Badge.count(
-        count: CartManager().productCount,
-        child: const Icon(
-          Icons.shopping_cart,
-        ),
-      ),
-      onPressed: onPressed,
+    return Consumer<CartManager>(
+      builder: (ctx, cartManager, child) {
+        return IconButton(
+          icon: Badge.count(
+            count: CartManager().productCount,
+            child: const Icon(
+              Icons.shopping_cart,
+            ),
+          ),
+          onPressed: onPressed,
+        );
+      },
     );
   }
 }

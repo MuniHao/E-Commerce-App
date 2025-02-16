@@ -1,6 +1,10 @@
 import '../../models/cart_item.dart';
 
-class CartManager {
+import '../../models/product.dart';
+
+import 'package:flutter/foundation.dart';
+
+class CartManager with ChangeNotifier {
   final Map<String, CartItem> _items = {
     'p1': CartItem(
       id: 'c1',
@@ -32,37 +36,55 @@ class CartManager {
     return total;
   }
 
-//   void addItem(String productId, String title, String imageUrl, double price) {
-//     if (_items.containsKey(productId)) {
-//       _items.update(
-//         productId,
-//         (existingCartItem) => CartItem(
-//           id: existingCartItem.id,
-//           title: existingCartItem.title,
-//           imageUrl: existingCartItem.imageUrl,
-//           price: existingCartItem.price,
-//           quantity: existingCartItem.quantity + 1,
-//         ),
-//       );
-//     } else {
-//       _items.putIfAbsent(
-//         productId,
-//         () => CartItem(
-//           id: productId,
-//           title: title,
-//           imageUrl: imageUrl,
-//           price: price,
-//           quantity: 1,
-//         ),
-//       );
-//     }
-//   }
+  void addItem(Product product) {
+    if (_items.containsKey(product.id)) {
+      _items.update(
+        product.id!,
+        (existingCartItem) => existingCartItem.copyWith(
+          quantity: existingCartItem.quantity + 1,
+        ),
+      );
+    } else {
+      _items.putIfAbsent(
+        product.id!,
+        () => CartItem(
+          id: 'c${DateTime.now().toIso8601String()}',
+          title: product.title,
+          imageUrl: product.imageUrl,
+          price: product.price,
+          quantity: 1,
+        ),
+      );
+    }
+    notifyListeners();
+  }
 
-//   void removeItem(String productId) {
-//     _items.remove(productId);
-//   }
+  void removeItem(String productId) {
+    if (!_items.containsKey(productId)) {
+      return;
+    }
 
-//   void clearCart() {
-//     _items.clear();
-//   }
+    if (_items[productId]?.quantity as num > 1) {
+      _items.update(
+        productId,
+        (existingCartItem) => existingCartItem.copyWith(
+          quantity: existingCartItem.quantity - 1,
+        ),
+      );
+    } else {
+      _items.remove(productId);
+    }
+    notifyListeners();
+  }
+
+  void clearItem(String productId) {
+    _items.remove(productId);
+    notifyListeners();
+  }
+
+  void clearAllItems() {
+    //_items = {}; ->>> error, items with type final, can not be {}
+    _items.clear();
+    notifyListeners();
+  }
 }
