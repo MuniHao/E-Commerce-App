@@ -8,6 +8,7 @@ import 'ui/products/product_detail_screen.dart';
 import 'ui/products/products_manager.dart';
 import 'package:provider/provider.dart';
 import 'ui/cart/cart_manager.dart';
+import 'ui/products/edit_product_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -65,6 +66,22 @@ class MyApp extends StatelessWidget {
               ),
         },
         onGenerateRoute: (settings) {
+          if (settings.name == EditProductScreen.routeName) {
+            final productId = settings.arguments as String?;
+            return MaterialPageRoute(
+              // settings: settings,
+              builder: (ctx) {
+                return SafeArea(
+                  child: EditProductScreen(
+                    //ProductsManager().findById(productId)!,
+                    productId != null
+                        ? ctx.read<ProductsManager>().findById(productId)
+                        : null,
+                  ),
+                );
+              },
+            );
+          }
           if (settings.name == ProductDetailScreen.routeName) {
             final productId = settings.arguments as String;
             return MaterialPageRoute(
@@ -72,7 +89,6 @@ class MyApp extends StatelessWidget {
               builder: (ctx) {
                 return SafeArea(
                   child: ProductDetailScreen(
-                    //ProductsManager().findById(productId)!,
                     ctx.read<ProductsManager>().findById(productId)!,
                   ),
                 );

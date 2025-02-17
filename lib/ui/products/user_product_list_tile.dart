@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myshop/ui/products/edit_product_screen.dart';
 
 import '../../models/product.dart';
 import 'package:provider/provider.dart';
@@ -20,25 +21,26 @@ class UserProductListTile extends StatelessWidget {
         width: 100,
         child: Row(
           children: <Widget>[
-            EditUserProductButton(
-              onPressed: () => print('Go to edit product screen'),
-            ),
+            EditUserProductButton(onPressed: () {
+              Navigator.of(context).pushNamed(
+                EditProductScreen.routeName,
+                arguments: product.id,
+              );
+            }),
             DeleteUserProductButton(
               onPressed: () {
                 context.read<ProductsManager>().deleteProduct(product.id!);
                 ScaffoldMessenger.of(context)
                   ..hideCurrentSnackBar()
                   ..showSnackBar(
-                    // const SnackBar(
-                    //     content: Text('Delete a product',
-                    //         textAlign: TextAlign.center)),
-                    const SnackBar(
-                      content: Text(
-                        'Product deleted',
-                        textAlign: TextAlign.center,
-                      )
-                    )
-                  );
+                      // const SnackBar(
+                      //     content: Text('Delete a product',
+                      //         textAlign: TextAlign.center)),
+                      const SnackBar(
+                          content: Text(
+                    'Product deleted',
+                    textAlign: TextAlign.center,
+                  )));
               },
             ),
           ],
