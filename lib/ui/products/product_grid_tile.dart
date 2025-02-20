@@ -31,23 +31,23 @@ class ProductGridTile extends StatelessWidget {
             onAddToCartPressed: () {
               //print('Add item to cart');
               final cart = context.read<CartManager>();
-              cart.addItem(product);
+              //cart.addItem(product);
+              cart.addItem2(product, 1, 'M');
 
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()
                 ..showSnackBar(
-                    SnackBar(
-                      content: const Text('Item added to cart'),
-
-                      duration: const Duration(seconds: 2),
-                      action: SnackBarAction(
-                          label: 'UNDO',
-                          onPressed: () {
-                            cart.removeItem(product.id!);
-                          },
-                      ),
+                  SnackBar(
+                    content: const Text('Item added to cart'),
+                    duration: const Duration(seconds: 2),
+                    action: SnackBarAction(
+                      label: 'UNDO',
+                      onPressed: () {
+                        cart.removeItem(product.id!);
+                      },
                     ),
-                  );
+                  ),
+                );
             },
           ),
           child: GestureDetector(

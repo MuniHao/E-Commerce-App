@@ -27,14 +27,13 @@ class _OrderItemCardState extends State<OrderItemCard> {
           OrderSummary(
             expanded: _expanded,
             order: widget.order,
-            onExpandPressed: (){
+            onExpandPressed: () {
               setState(() {
                 _expanded = !_expanded;
               });
             },
-          ), 
-          if (_expanded)
-            OrderItemList(widget.order), 
+          ),
+          if (_expanded) OrderItemList(widget.order),
         ],
       ),
     );
@@ -61,7 +60,7 @@ class OrderItemList extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    prod.title,
+                    '${prod.title} --size ${prod.size}',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

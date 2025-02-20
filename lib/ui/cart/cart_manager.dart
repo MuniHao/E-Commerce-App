@@ -13,6 +13,7 @@ class CartManager with ChangeNotifier {
           'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
       price: 29.99,
       quantity: 2,
+      size: 'X',
     ),
   };
 
@@ -53,11 +54,41 @@ class CartManager with ChangeNotifier {
           imageUrl: product.imageUrl,
           price: product.price,
           quantity: 1,
+          size: 'X',
         ),
       );
     }
     notifyListeners();
   }
+
+  void addItem2(Product product, int quantity, String? size) {
+    if (size == null) return; // Đảm bảo có size được chọn
+
+    final productKey = '${product.id}_$size';
+
+    if (_items.containsKey(productKey)) {
+      _items.update(
+        productKey,
+        (existingCartItem) => existingCartItem.copyWith(
+          quantity: existingCartItem.quantity + quantity,
+        ),
+      );
+    } else {
+      _items.putIfAbsent(
+        productKey,
+        () => CartItem(
+          id: 'c${DateTime.now().toIso8601String()}',
+          title: product.title,
+          imageUrl: product.imageUrl,
+          price: product.price,
+          quantity: quantity,
+          size: size, // Thêm kích thước vào giỏ hàng
+        ),
+      );
+    }
+    notifyListeners();
+  }
+
 
   void removeItem(String productId) {
     if (!_items.containsKey(productId)) {

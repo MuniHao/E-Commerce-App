@@ -73,7 +73,7 @@ class ItemInfoCard extends StatelessWidget {
               height: 80,
             ),
           ),
-          title: Text(cartItem.title),
+          title: Text('${cartItem.title} ' ' size: ' ' ${cartItem.size}'),
           subtitle: Text('Total: \$${(cartItem.price * cartItem.quantity)}'),
           trailing: Text(
             '${cartItem.quantity} x \$${cartItem.price}',

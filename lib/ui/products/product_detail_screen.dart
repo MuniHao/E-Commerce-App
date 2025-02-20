@@ -3,6 +3,8 @@ import '../../models/product.dart';
 
 import '../../ui/cart/cart_screen.dart';
 import '../products/products_overview_screen.dart';
+import 'package:provider/provider.dart';
+import '../cart/cart_manager.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   static const routeName = '/product_detail';
@@ -55,14 +57,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.product.title),
         backgroundColor: Colors.green,
-               actions: [
+        actions: [
           IconButton(
             icon: const Icon(Icons.home),
             onPressed: () {
@@ -248,45 +249,127 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(child: Container()),
-                      ElevatedButton.icon(
-                        onPressed: _choosenSize != null
-                            ? () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Added $_quantity ${widget.product.title} (Size $_choosenSize) to cart',
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    duration: const Duration(seconds: 2),
-                                  ),
-                                );
-                              }
-                            : null,
-                        icon: const Icon(Icons.shopping_cart, size: 28),
-                        label: const Text(
-                          'Add to Cart',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: Colors.green,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  AddToCartButton(
+                      choosenSize: _choosenSize,
+                      quantity: _quantity,
+                      widget: widget),
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+// class AddToCartButton extends StatelessWidget {
+//   const AddToCartButton({
+//     super.key,
+//     required String? choosenSize,
+//     required int quantity,
+//     required this.widget,
+//   }) : _choosenSize = choosenSize, _quantity = quantity;
+
+//   final String? _choosenSize;
+//   final int _quantity;
+//   final ProductDetailScreen widget;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       children: [
+//         Expanded(child: Container()),
+//         ElevatedButton.icon(
+//           onPressed: _choosenSize != null
+//               ? () {
+//                   ScaffoldMessenger.of(context).showSnackBar(
+//                     SnackBar(
+//                       content: Text(
+//                         'Added $_quantity ${widget.product.title} (Size $_choosenSize) to cart',
+//                         textAlign: TextAlign.center,
+//                       ),
+//                       duration: const Duration(seconds: 2),
+//                     ),
+//                   );
+//                 }
+//               : null,
+//           icon: const Icon(Icons.shopping_cart, size: 28),
+//           label: const Text(
+//             'Add to Cart',
+//             style: TextStyle(
+//                 fontSize: 20, fontWeight: FontWeight.bold),
+//           ),
+//           style: ElevatedButton.styleFrom(
+//             padding: const EdgeInsets.symmetric(vertical: 16),
+//             backgroundColor: Colors.green,
+//             shape: RoundedRectangleBorder(
+//               borderRadius: BorderRadius.circular(12),
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
+
+class AddToCartButton extends StatelessWidget {
+  const AddToCartButton({
+    super.key,
+    required String? choosenSize,
+    required int quantity,
+    required this.widget,
+  })  : _choosenSize = choosenSize,
+        _quantity = quantity;
+
+  final String? _choosenSize;
+  final int _quantity;
+  final ProductDetailScreen widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(child: Container()),
+        ElevatedButton.icon(
+          onPressed: _choosenSize != null
+              ? () {
+                  final cart = context.read<CartManager>();
+                  cart.addItem2(widget.product, _quantity, _choosenSize); //need to update quantity and choosenSize for addItem
+                                                                          //function at product_grid_tile
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Added $_quantity ${widget.product.title} (Size $_choosenSize) to cart',
+                          textAlign: TextAlign.center,
+                        ),
+                        duration: const Duration(seconds: 2),
+                        action: SnackBarAction(
+                          label: 'UNDO',
+                          onPressed: () {
+                            cart.removeItem(widget.product.id!);
+                          },
+                        ),
+                      ),
+                    );
+                }
+              : null,
+          icon: const Icon(Icons.shopping_cart, size: 28),
+          label: const Text(
+            'Add to Cart',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            backgroundColor: Colors.green,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

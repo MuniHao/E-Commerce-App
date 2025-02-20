@@ -4,6 +4,8 @@ class CartItem {
   final String imageUrl;
   final int quantity;
   final double price;
+  final String size; // Thêm thuộc tính size
+
 
   CartItem({
     required this.id,
@@ -11,6 +13,7 @@ class CartItem {
     required this.imageUrl,
     required this.quantity,
     required this.price,
+    required this.size,
   });
 
   CartItem copyWith({
@@ -19,6 +22,7 @@ class CartItem {
     String? imageUrl,
     int? quantity,
     double? price,
+    String? size, 
   }) {
     return CartItem(
       id: id ?? this.id,
@@ -26,6 +30,7 @@ class CartItem {
       imageUrl: imageUrl ?? this.imageUrl,
       quantity: quantity ?? this.quantity,
       price: price ?? this.price,
+      size: size ?? this.size,
     );
   }
 }
