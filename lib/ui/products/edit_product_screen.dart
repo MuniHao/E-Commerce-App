@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/product.dart';
@@ -33,42 +36,18 @@ class EditProductScreen extends StatefulWidget {
 }
 
 class _EditProductScreenState extends State<EditProductScreen> {
-  final _imageUrlController = TextEditingController();
-  final _imageUrlFocusNode = FocusNode();
   final _editForm = GlobalKey<FormState>();
   late Product _editedProduct;
 
-  bool _isValidImageUrl(String value) {
-    return (value.startsWith('http') || value.startsWith('https')) &&
-        (value.endsWith('.png') ||
-            value.endsWith('.jpg') ||
-            value.endsWith('.jpeg'));
-  }
-
   @override
   void initState() {
-    _imageUrlFocusNode.addListener(() {
-      if (!_imageUrlFocusNode.hasFocus) {
-        if (!_isValidImageUrl(_imageUrlController.text)) {
-          return;
-        }
-        setState(() {});
-      }
-    });
     _editedProduct = widget.product;
-    _imageUrlController.text = _editedProduct.imageUrl;
     super.initState();
   }
 
-  @override
-  void dispose() {
-    _imageUrlController.dispose();
-    _imageUrlFocusNode.dispose();
-    super.dispose();
-  }
-
   Future<void> _saveForm() async {
-    final isValid = _editForm.currentState!.validate();
+    final isValid =
+        _editForm.currentState!.validate() && _editedProduct.hasFeaturedImage();
     if (!isValid) {
       return;
     }
@@ -77,12 +56,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
     try {
       final productsManager = context.read<ProductsManager>();
       if (_editedProduct.id != null) {
-        productsManager.updateProduct(_editedProduct);
+        await productsManager.updateProduct(_editedProduct);
       } else {
-        productsManager.addProduct(_editedProduct);
+        await productsManager.addProduct(_editedProduct);
       }
     } catch (error) {
-      await showErrorDialog(context, 'Something went wrong');
+      if (mounted) {
+        await showErrorDialog(context, 'Something went wrong');
+      }
     }
 
     if (mounted) {
@@ -106,12 +87,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Form(
                 key: _editForm,
-                child: ListView(
-                  children: <Widget>[
-                    _buildTitleField(),
-                    _buildDescriptionField(),
-                    _buildPriceField(),
-                    _buildProductPreview(),
+                child: ListView(children: <Widget>[
+                  _buildTitleField(),
+                  _buildDescriptionField(),
+                  _buildPriceField(),
+                  _buildProductPreview(),
                 ]))));
   }
 
@@ -180,7 +160,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   Widget _buildProductPreview() {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Container(
           width: 100,
@@ -189,42 +169,48 @@ class _EditProductScreenState extends State<EditProductScreen> {
           decoration: BoxDecoration(
             border: Border.all(width: 1, color: Colors.grey),
           ),
-          child: _imageUrlController.text.isEmpty
-              ? const Text('Enter a URL')
+          child: !_editedProduct.hasFeaturedImage()
+              ? const Center(child: Text('No image'))
               : FittedBox(
-                  child: Image.network(
-                    _imageUrlController.text,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                  child: _editedProduct.featuredImage == null
+                      ? Image.network(
+                          _editedProduct.imageUrl,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.file(
+                          _editedProduct.featuredImage!,
+                          fit: BoxFit.cover,
+                        )),
         ),
         Expanded(
-          child: _buildImageURLField(),
+          child: SizedBox(height: 100, child: _buildImagePickerButton()),
         ),
       ],
     );
   }
 
-  TextFormField _buildImageURLField() {
-    return TextFormField(
-      decoration: const InputDecoration(labelText: 'Image URL'),
-      keyboardType: TextInputType.url,
-      textInputAction: TextInputAction.done,
-      controller: _imageUrlController,
-      focusNode: _imageUrlFocusNode,
-      onFieldSubmitted: (value) => _saveForm(),
-      validator: (value) {
-        if (value!.isEmpty) {
-          return 'Please enter an image URL.';
-        }
-        if (!_isValidImageUrl(value)) {
-          return 'Please enter a valid image URL.';
-        }
-        return null;
-      },
-      onSaved: (value) {
-        _editedProduct = _editedProduct.copyWith(imageUrl: value);
-      },
-    );
+  TextButton _buildImagePickerButton() {
+    return TextButton.icon(
+        icon: const Icon(Icons.image),
+        label: const Text('Pick Image'),
+        onPressed: () async {
+          final imagePicker = ImagePicker();
+          try {
+            final imageFile =
+                await imagePicker.pickImage(source: ImageSource.gallery);
+            if (imageFile == null) {
+              return;
+            }
+            _editedProduct = _editedProduct.copyWith(
+              featuredImage: File(imageFile.path),
+            );
+
+            setState(() {});
+          } catch (error) {
+            if (mounted) {
+              showErrorDialog(context, 'Something went wrong');
+            }
+          }
+        });
   }
 }
