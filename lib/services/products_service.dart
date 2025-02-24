@@ -38,4 +38,29 @@ class ProductsService {
       return null;
     }
   }
+
+  Future<List<Product>> fetchProducts({bool filteredByUser = false}) async {
+    final List<Product> products = [];
+
+    try {
+      final pb = await getPocketbaseInstance();
+      final userId = pb.authStore.record!.id;
+      final productModels = await pb
+          .collection('products')
+          .getFullList(filter: filteredByUser ? "userId='$userId'" : null);
+
+      for (final productModel in productModels) {
+        products.add(
+          Product.fromJson(
+            productModel.toJson()
+              ..addAll({'imageUrl': _getFeaturedImageUrl(pb, productModel)}),
+          ),
+        );
+      }
+
+      return products;
+    } catch (error) {
+      return products;
+    }
+  }
 }

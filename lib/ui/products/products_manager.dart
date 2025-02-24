@@ -5,7 +5,7 @@ import '../../services/products_service.dart';
 
 class ProductsManager with ChangeNotifier {
   final ProductsService _productsService = ProductsService();
-  final List<Product> _items = [
+  List<Product> _items = [
     // Product(
     //   id: 'p1',
     //   title: 'Red Shirt',
@@ -64,7 +64,7 @@ class ProductsManager with ChangeNotifier {
 
   Future<void> addProduct(Product product) async {
     final newProduct = await _productsService.addProduct(product);
-    if(newProduct != null) {
+    if (newProduct != null) {
       _items.add(newProduct);
       notifyListeners();
     }
@@ -81,6 +81,18 @@ class ProductsManager with ChangeNotifier {
   void deleteProduct(String id) {
     final index = _items.indexWhere((item) => item.id == id);
     _items.removeAt(index);
+    notifyListeners();
+  }
+
+  Future<void> fetchProducts() async {
+    _items = await _productsService.fetchProducts();
+    notifyListeners();
+  }
+
+  Future<void> fetchUserProducts() async {
+    _items = await _productsService.fetchProducts(
+      filteredByUser: true,
+    );
     notifyListeners();
   }
 }

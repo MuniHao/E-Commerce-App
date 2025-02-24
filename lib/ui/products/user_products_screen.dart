@@ -7,9 +7,22 @@ import '../shared/app_drawer.dart';
 
 import 'package:provider/provider.dart';
 
-class UserProductsScreen extends StatelessWidget {
+class UserProductsScreen extends StatefulWidget {
   static const routeName = '/user_products';
   const UserProductsScreen({super.key});
+
+  @override
+  State<UserProductsScreen> createState() => _UserProductsScreenState();
+}
+
+class _UserProductsScreenState extends State<UserProductsScreen> {
+  late Future<void> _fetchUserProducts;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserProducts = context.read<ProductsManager>().fetchUserProducts();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +41,20 @@ class UserProductsScreen extends StatelessWidget {
         ],
       ),
       drawer: const AppDrawer(),
-      body: const UserProductList(),
+      body: FutureBuilder(
+          future: _fetchUserProducts,
+          builder: (ctx, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return RefreshIndicator(
+                onRefresh: () =>
+                    context.read<ProductsManager>().fetchUserProducts(),
+                child: const UserProductList(),
+                );
+          }),
     );
   }
 }

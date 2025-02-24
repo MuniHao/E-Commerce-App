@@ -5,6 +5,7 @@ import 'package:myshop/ui/shared/app_drawer.dart';
 import 'products_grid.dart';
 import '../cart/cart_manager.dart';
 import 'package:provider/provider.dart';
+import 'products_manager.dart';
 
 enum FilterOptions { favorites, all }
 
@@ -17,31 +18,48 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   var _currentFilter = FilterOptions.all;
+  late Future<void> _fetchProducts;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProducts = context.read<ProductsManager>().fetchProducts();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('MyShop'),
-        actions: <Widget>[
-          ProductFilterMenu(
-            currentFilter: _currentFilter,
-            onFilterSelected: (filter) {
-              setState(() {
-                _currentFilter = filter;
-              });
-            },
-          ),
-          ShoppingCartButton(
-            onPressed: () {
-              print('Go to cart screen');
-              Navigator.of(context).pushNamed(CartScreen.routeName);
-            },
-          ),
-        ],
-      ),
-      drawer: const AppDrawer(),
-      body: ProductsGrid(_currentFilter == FilterOptions.favorites),
+        appBar: AppBar(
+          title: const Text('MyShop'),
+          actions: <Widget>[
+            ProductFilterMenu(
+              currentFilter: _currentFilter,
+              onFilterSelected: (filter) {
+                setState(() {
+                  _currentFilter = filter;
+                });
+              },
+            ),
+            ShoppingCartButton(
+              onPressed: () {
+                print('Go to cart screen');
+                Navigator.of(context).pushNamed(CartScreen.routeName);
+              },
+            ),
+          ],
+        ),
+        drawer: const AppDrawer(),
+        body: FutureBuilder(
+            future: _fetchProducts,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return ProductsGrid(_currentFilter == FilterOptions.favorites);
+              }
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+        )
     );
   }
 }
