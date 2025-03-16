@@ -6,10 +6,51 @@ import 'cart_item_card.dart';
 import 'package:provider/provider.dart';
 
 import '../orders/orders_manager.dart';
+import '../../services/database_helper_service.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   static const routeName = '/cart';
   const CartScreen({super.key});
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  var _isLoading = false;
+
+    @override
+  void initState() {
+    super.initState();
+    debugFetchCartItems();
+    _fetchCartItems();
+  }
+
+    Future<void> debugFetchCartItems() async {
+     final db = await SQLiteService().database;
+     final List<Map<String, dynamic>> result = await db.query('carts');
+     print("📋 Dữ liệu trong bảng carts:");
+     for (var row in result) {
+       print(row);
+     }
+   }
+
+    Future<void> _fetchCartItems() async {
+      setState(() {
+        _isLoading = true;
+      });
+
+
+      try {
+        await context.read<CartManager>().fetchCartItems();
+      } catch (error) {
+        print("Error fetching cart: $error");
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +77,14 @@ class CartScreen extends StatelessWidget {
                         cart.clearAllItems();
                       }),
         const SizedBox(height: 10),
-        Expanded(child: CartItemList(cart)),
+        Expanded(
+          child: _isLoading
+              ? const Center(
+                  child: CircularProgressIndicator()) // Hiển thị loading
+              : cart.productEntries.isEmpty
+                  ? const Center(child: Text('Your cart is empty'))
+                  : CartItemList(cart),
+        ),
       ]),
     );
   }

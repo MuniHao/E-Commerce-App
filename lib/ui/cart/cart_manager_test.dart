@@ -22,20 +22,25 @@ class CartManager with ChangeNotifier {
 
   Future<void> fetchCartItems() async {
     final cartItems = await _cartsService.fetchCartItems(filteredByUser: true);
-    // _items.clear();
-    // for (final item in cartItems) {
-    //   final key = _createKey(item.productId, item.size);
-    //   _items[key] = item;
-    // }
-    _items
-      ..clear()
-      ..addEntries(cartItems.map(
-          (item) => MapEntry(_createKey(item.productId, item.size), item)));
- 
+    print("Fetched items: $cartItems");
+
+    _items.clear();
+    for (final item in cartItems) {
+      final key = _createProductKey(item.productId, item.size);
+      _items[key] = item;
+    }
+
+    //  _items
+    //   ..clear()
+    //   ..addEntries(cartItems.map((item) =>
+    //       MapEntry(_createProductKey(item.productId, item.size), item)));
+
+    print("Cart after fetch: $_items");
     notifyListeners();
   }
 
-  String _createKey(String productId, String size) {
+  // Key: productId - size
+  String _createProductKey(String productId, String size) {
     return '$productId-$size';
   }
 
@@ -61,10 +66,11 @@ class CartManager with ChangeNotifier {
 
   void addItembasic(Product product) {
     if (product.id == null) {
-      print('Lỗi: product.id là null, không thể thêm vào giỏ hàng.');
+      print('Erros: product.id is null value, cannot add to cart.');
       return;
     }
 
+    print("Adding item: ${product.id} - ${product.title}");
     if (_items.containsKey(product.id)) {
       _items.update(
         product.id!,
@@ -89,6 +95,7 @@ class CartManager with ChangeNotifier {
     notifyListeners();
   }
 
+  // Keep this addItem function for use when sqlite is not in use
   // void addItem2(Product product, int quantity, String? size) {
   //   if (size == null) return; // Đảm bảo có size được chọn
 
@@ -118,20 +125,25 @@ class CartManager with ChangeNotifier {
   //   notifyListeners();
   // }
 
-    Future<void> addItem(Product product,
-      int quantity, String ?size) async {
-    final key = _createKey(product.id!, size!);
+  Future<void> addItem(Product product, int quantity, String? size) async {
+    if (product.id == null || size == null) {
+      print("Error: product.id or size is null, cannot add to cart.");
+      return;
+    }
+    final key = _createProductKey(product.id!, size!);
+    print("Adding item: $key (Qty: $quantity)");
 
-    // if products
+    // if products already exist, add product quantity
     if (_items.containsKey(key)) {
-      // final updatedQuantity = _items[key]!.quantity + quantity;
-      // _items[key] = _items[key]!.copyWith(quantity: updatedQuantity);
-      _items[key] = _items[key]!.copyWith(
+      final updatedItem = _items[key]!.copyWith(
         quantity: _items[key]!.quantity + quantity,
       );
-      await _cartsService.updateCartItem(_items[key]!);
+
+      _items[key] = updatedItem;
+      print("Updating existing item in SQLite: $updatedItem");
+      await _cartsService.updateCartItem(updatedItem);
     } else {
-      // Nếu sản phẩm chưa có trong giỏ hàng, thêm mới
+      // If the product is not in the cart, add new
       final newItem = CartItem(
         productId: product.id!,
         title: product.title,
@@ -142,14 +154,15 @@ class CartManager with ChangeNotifier {
       );
 
       // Thêm vào SQLite và nhận lại đối tượng từ SQLite
+      print("Adding new item to SQLite: $newItem");
       final addedItem = await _cartsService.addCartItem(newItem);
       if (addedItem != null) {
         _items[key] = addedItem;
       }
     }
+    print("Cart after addItem: $_items");
     notifyListeners(); // Cập nhật giao diện
   }
-
 
   void removeItem(String productId) {
     if (!_items.containsKey(productId)) {

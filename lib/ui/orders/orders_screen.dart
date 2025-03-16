@@ -6,10 +6,44 @@ import '../shared/app_drawer.dart';
 
 import 'package:provider/provider.dart';
 
-class OrdersScreen extends StatelessWidget {
+class OrdersScreen extends StatefulWidget {
   static const routeName = '/orders';
   const OrdersScreen({super.key});
 
+  @override
+  State<OrdersScreen> createState() => _OrdersScreenState();
+}
+
+class _OrdersScreenState extends State<OrdersScreen> {
+  var _isLoading = false;
+
+  late Future<void> _fetchOrders;
+
+    @override
+  void initState() {
+    super.initState();
+    _fetchOrders = context.read<OrdersManager>().fetchOrders();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isLoading) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<OrdersManager>(context, listen: false)
+          .fetchOrders()
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
+  }
+
+
+  
   @override
   Widget build(BuildContext context) {
     // final ordersManager = OrdersManager();

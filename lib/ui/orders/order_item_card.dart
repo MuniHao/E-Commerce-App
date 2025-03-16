@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../models/order_item.dart';
+import 'package:myshop/ui/orders/orders_manager.dart';
+import 'package:provider/provider.dart';
 
 class OrderItemCard extends StatefulWidget {
   final OrderItem order;

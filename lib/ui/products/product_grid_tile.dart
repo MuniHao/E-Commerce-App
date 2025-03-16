@@ -32,7 +32,7 @@ class ProductGridTile extends StatelessWidget {
               //print('Add item to cart');
               final cart = context.read<CartManager>();
               //cart.addItem(product);
-              cart.addItem2(product, 1, 'M');
+              cart.addItem(product, 1, 'M');
 
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()

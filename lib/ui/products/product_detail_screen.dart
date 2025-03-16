@@ -335,7 +335,7 @@ class AddToCartButton extends StatelessWidget {
           onPressed: _choosenSize != null
               ? () {
                   final cart = context.read<CartManager>();
-                  cart.addItem2(widget.product, _quantity, _choosenSize); //need to update quantity and choosenSize for addItem
+                  cart.addItem(widget.product, _quantity, _choosenSize); //need to update quantity and choosenSize for addItem
                                                                           //function at product_grid_tile
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
