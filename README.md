@@ -24,12 +24,12 @@ The E-Commerce-App is a cross-platform Flutter mobile app for Android and iOS, d
 
 ## Interface illustration
 
-![Homepage](assets/image/home.jpg)
-![Homepage2](assets/image/home2.jpg)
-![Login](assets/image/login.jpg)
-![Manage Products](assets/image/manageproducts.jpg)
-![Menu](assets/image/menudropdown.jpg)
-![PocketBase](assets/image/PocketBase.jpg)
+<p align="center">
+  <img src="assets/image/home2.jpg" width="260"/>
+  <img src="assets/image/manageproducts.jpg" width="254"/>
+  <br/>
+  <img src="assets/image/PocketBase.jpg" width="̀500"/>
+</p>
 
 ## Setup
 Clone the repo, run `flutter pub get`, configure PocketBase, and launch with `flutter run`.
