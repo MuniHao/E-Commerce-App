@@ -41,6 +41,11 @@ flutter:
     - assets/image/menudropdown.jpg
     - assets/image/PocketBase.jpg
     - assets/image/productdetail.jpg
+    - assets/image/PB1.jpg
+    - assets/image/PB2.jpg
+    - assets/image/PB3.jpg
+    - assets/image/PB4.jpg
+    - assets/image/PB5.jpg
   fonts:
     - family: Lato
       fonts:
