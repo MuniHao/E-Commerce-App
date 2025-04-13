@@ -34,6 +34,13 @@ flutter:
   assets:
     - .env
     - assets/cart.db
+    - assets/image/home.jpg
+    - assets/image/home2.jpg
+    - assets/image/login.jpg
+    - assets/image/manageproducts.jpg
+    - assets/image/menudropdown.jpg
+    - assets/image/PocketBase.jpg
+    - assets/image/productdetail.jpg
   fonts:
     - family: Lato
       fonts:
